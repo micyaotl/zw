@@ -1,0 +1,119 @@
+﻿@charset "utf-8";
+/* g.css Global styles ZihWeb CMS
+(c) 2012 feelRiviera
+*/
+.fltLft{float:left;}
+.fltRgt{float:right;}
+.txtRgt{text-align:right;}
+.txtCnt{text-align:center;}
+.blk{display:block;padding:0;}
+#w2 li{display:inline-block;list-style:none;margin:3px;}
+#w2 li a{display:inline-block;height:24px;overflow:hidden;text-indent:-1000px;width:24px;}
+#w2 .fb{background:url(img/w2/facebook.png);}
+#w2 .fl{background:url(img/w2/flickr.png);}
+#w2 .tw{background:url(img/w2/twitter.png);}
+#w2 .fe{background:url(img/w2/feed.png);}
+#w2 .tm{background:url(img/w2/tumblr.png);}
+#w2 .feelR{background:url(img/w2/feelriviera.png);}
+#w2 .gp{background:url(img/w2/gplus.png);}
+#w2 .li{background:url(img/w2/linkedin.png);}
+#w2 .yt{background:url(img/w2/youtube.png);}
+#w2 .ta{background:url(img/w2/tripadvisor.png);}
+.i_es,.i_en,.i_de,.i_fr,.i_it,.i_ja,.i_zh{background:no-repeat;display:inline-block;height:11px;margin:3px;overflow:hidden;text-indent:-1000px;width:16px;}
+.i_es{background:url(img/i/es.gif);}
+.i_en{background:url(img/i/en.gif);}
+.i_de{background:url(img/i/de.gif);}
+.i_fr{background:url(img/i/fr.gif);}
+.i_it{background:url(img/i/it.gif);}
+.i_ja{background:url(img/i/ja.gif);}
+.i_zh{background:url(img/i/zh.gif);}
+.i_pt{background:url(img/i/pt.gif);}
+.lnkshr dt img{margin-right:10px;}
+.vcard .devfr{background:url(http://feelriviera.com/tmp/30x30.cv-logo_2010-hotelsguides.png) no-repeat left;clear:both;display:block;font-size:1.8em;font-style:normal;font-weight:bold;line-height:35px;text-indent:33px;}
+.btn:hover,
+.btn{border-radius:3px;font-weight:bold;padding:5px;}
+.btnLime{background:#00ff00;border:solid 1px #33dd33;}
+.btnOrange{background:#ff8c00;border:solid 1px #ff0000;}
+.btnRed{background:#ff6347;border:solid 1px #ff0000;color:#ffffff;text-shadow:0px 1px 0px #000000;}
+ul.tmbl{margin:0;padding:0;}
+li.tmbl{display:inline;list-style:none;}
+.cform textarea,
+.cform input{border:solid 1px #ccc;margin:3px 0px 3px 0px;}
+.spcr{background:#ccc;border:solid 1px #ccc;}
+.w300{width:300px;}
+.w200{
+	width: 200px;
+}
+.w50{width:49%;}
+.h250{height:250px;}
+.h600{height:600px;}
+
+
+/* Listings */
+.dirlst li,
+dd.lst{border-bottom:#ccc solid 1px;}
+li .neg .dat{display:block;height:140px;margin-left:110px;}
+li .neg .logo{display:inline;float:left;width:100px;height:100px;overflow:hidden;}
+.nl .logo { background-image: url(lib/img/nologo.png); }
+input,textarea,select{border:#ccc solid 1px;}
+.dirlst{list-style:none;padding:0;}
+.ndn,
+.lnkshr .ltit{font-size:1.5em;}
+.ddn{color:#333333;font-size:0.8em;}
+
+.lnkshr .lurl{font-size:0.8em;}
+.lnkshr .ldes{font-size:0.9em;line-height:1.2em;}
+.lnkthu{font-size:0.7em;}
+.licount{color:#ccc;font-size:5em;font-weight:bold;}
+h2.lst,
+dt.lst{color:#333333;font-size:1.2em;font-weight:normal;line-height:1.3em;}
+.lstcat dl{display:inline;}
+.lstcat dt,
+.lstcat dd{display:block;max-height:150px;max-width:200px;overflow:hidden;}
+
+/* Lists Categories */
+#content .lcat{list-style:none;float:left;width:220px;}
+#content a.lcat{font-size:1.12em;font-weight:bold;}
+ul.lstcat {
+	padding: 0;
+
+}
+ul.lstcat li ul{padding:0 10px 20px 0;}
+
+.lscat{font-size:0.8em;font-weight:lighter;display:inline;list-style:none;}
+
+.pnav{clear:both;padding:20px 0 20px 0;}
+.pnav a:hover,
+.pnav a{border:thin solid #ccc;border-radius:3px;line-height:30px;padding:5px;}
+.pnav a:hover{background:#00bfff;color:#ffffff;}
+
+#navExt{display:block;text-align:center;width:100%;}
+#navExt a{color:#2c7ad1;text-decoration:none;text-transform:uppercase; font-weight:bold; margin:5px;padding:5px;}
+#navExt a:hover{
+border-radius:3px;
+background: #00bfff;
+color:#333333;
+}
+
+.txtLft,dl.lnkshr{text-align:left;}
+.lnkshr dd,.dirlst li,
+dd.lst,
+.lnkshr img{margin-bottom:20px;}
+/* Bottom Listings */
+
+
+#extras .lstcat li{
+	margin: 5px 5px 5px 0px;
+}
+/* AUTOCOMPLETE */
+#autocomp-cont {
+	display:block;clear:both; width:100%; height:90px;text-align:center;
+}
+input.autocomplete { font-size: 28px; padding: 10px; border: 5px solid #ccc; display: block; position: absolute; margin: 20px 0; width: 650px; clear:both; }
+.autocomplete-suggestions { border: 1px solid #ccc; background: #FFF; cursor: default; overflow: auto; -webkit-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); -moz-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); }
+.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+.autocomplete-no-suggestion { padding: 2px 5px;}
+.autocomplete-selected { background: #F0F0F0; }
+.autocomplete-suggestions strong { font-weight: bold; color: #000; }
+.autocomplete-group { padding: 2px 5px; }
+.autocomplete-group strong { font-weight: bold; font-size: 16px; color: #000; display: block; border-bottom: 1px solid #000; }

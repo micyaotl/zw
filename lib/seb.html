@@ -1,0 +1,1094 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://mexicobyimages.com/libs/jquery/wizard.js"></script>
+<script type="text/javascript" src="http://mexicobyimages.com/libs/jquery/jquery.validate.js"></script>
+<script type="text/javascript" src="http://mexicobyimages.com/libs/jquery/jquery.als.min.js"></script>
+<script type="text/javascript" src="http://mexicobyimages.com/libs/jquery/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="http://mexicobyimages.com/libs/jquery/small-slideshow.js"></script>
+ <script type="text/javascript" >
+  var pagestoshow = ;
+  function createCookie(name,value,days) {
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime()+(days*24*60*60*1000));
+    var expires = "; expires="+date.toGMTString();
+  }
+  else var expires = "";
+  document.cookie = name+"="+value+expires+"; path=/";
+  };
+  
+  function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+  function eraseCookie(name) {
+    var d = new Date();
+        d.setDate(d.getDate()-10);
+    createCookie("fechas", "", d);
+  };
+  </script>
+<script type="text/javascript">	
+var JQ = jQuery.noConflict();
+var mouse_is_inside = false;
+JQ(document).ready(function(){
+	function reloadProfile ($dat) {
+		 JQ('html').load($dat);
+	};
+    JQ(".info-block a").tooltip({
+		position: {
+			my: "center bottom-20",
+			at: "center top",
+			using: function( position, feedback ) {
+				JQ( this ).css( position );
+				JQ( "<div>" )
+					.addClass( "arrow" )
+					.addClass( feedback.vertical )
+					.addClass( feedback.horizontal )
+					.appendTo( this );
+			}
+		}
+	});
+	JQ("img.lazyload").lazyload({
+		 effect       : "fadeIn",
+		 failure_limit : 200
+	 }).removeClass("lazyload");
+	JQ("img.lazygalload").lazyload({
+		 effect       : "fadeIn",
+		 event : "scrll",
+		 failure_limit : 200
+	 }).removeClass("lazyload"); 
+	JQ(document).ajaxStop(function(){
+		JQ("img.lazyload").lazyload({ 
+			effect: "fadeIn",
+			failure_limit : 200
+		}).removeClass("lazyload");
+	}); 
+	function lazyReload () {	
+		JQ("img.lazyload").lazyload({ 
+			effect: "fadeIn",
+		 	failure_limit : 200
+		}).removeClass("lazyload");
+	}; 
+	JQ('#access a').each(function() {	
+		 if(this.href.trim() == window.location){
+	        JQ('a').removeClass("expanded");
+	        JQ('a').removeClass("selected");
+            JQ(this).addClass("selected").parent().parent().parent().find('a').first().addClass("expanded");
+			localStorage.setItem('submenu', JQ(this).attr("id"));
+			localStorage.setItem('topmenu', JQ(this).parent().parent().parent().find('a').first().attr("id"));
+		 }else if(JQ(this).attr("id") == localStorage.getItem('submenu')){
+			JQ('a').removeClass("expanded");
+	        JQ('a').removeClass("selected");
+			JQ(this).addClass("selected").parent().parent().parent().find('a').first().addClass("expanded");		
+        }
+    });
+	
+	//PROFILE
+	JQ(".profile_forms").live('click', function (event) {
+		var str = JQ(this).attr('name');
+		var uri = JQ(this).attr('href');
+		var lod = JQ(this).append("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/action/",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){
+					reloadProfile(uri);	
+					//location.reload();
+				}else{
+					lod.html(arr.msg);
+				}
+	
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ('#short_profile').hide();
+	JQ("#toggle").click(function () {
+		JQ("#short_profile").toggle();
+	});
+			//END		
+	JQ('a.close-link').live('click', function (event) {
+		JQ('#box').html('');
+		event.preventDefault();
+		return false;
+	});
+	JQ('a.profile-link').live('click', function (event) {
+		var tt = JQ(this).attr('href');
+		var ajax_load = "<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />";
+		var loadUrl = tt;
+		JQ("#box").html(ajax_load).load(loadUrl, {
+	
+			}, function () {
+		});
+		event.preventDefault();
+		return false;
+	});			
+	JQ("#post").click(function (event) {
+		var str = JQ(this).parent().serialize(); 
+		var lod = JQ("#post_form #loader").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/action/",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){
+					JQ("#updates").prepend('<li class="clear">'+arr.bizz+'</li>');
+					lod.html('');
+				}else{
+					lod.html(arr.msg);
+				}
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ(".del-link").live("click", function (event) {
+		var str = JQ(this).attr('name'); 
+		var lod = JQ(this);
+        lod.html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />");  
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/links/lib/del.php",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){
+					lod.html(arr.bizz);
+					lod.parent().parent().remove();
+				}else{
+					lod.html(arr.msg);
+				}
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ(".send").click(function (event) { 
+		var str = JQ("#web_form").serialize(); 
+		var lod = JQ("#web_form #loader").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/form/lib/send.php",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){						
+					lod.html(arr.bizz);
+				}else{					
+					JQ("#checked").text(arr.bizz);
+					lod.html('');
+				}
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+		
+	JQ('a.frame-link').live('click', function (event) {
+		JQ('#box').html('<div><iframe id="frame_box"/></div>');
+        var tt = JQ(this).attr('href');
+		JQ('#frame_box').attr('src', tt);
+        event.preventDefault();
+        return false;
+    });
+	
+	JQ(".act-link").live("click", function (event) {
+		var str = JQ(this).attr('name'); 
+		var lod = JQ(this);
+        lod.html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />");  
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/action/",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){
+					lod.html(arr.bizz);
+					lod.parent().parent().parent().removeClass('disabled');
+				}else{
+					lod.html(arr.msg);
+				}
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ(".gopic").live("click", function (event) {
+            var str = JQ(this).parent().parent().serialize(); 
+            var lod = JQ(this).parent().find(".loader");
+            lod.html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+            JQ.ajax({
+                type: "POST",
+                url: "http://www.todorivieramaya.com/app/mods/gallery/lib/new.php",
+                data: str,
+                cache: false,
+                dataType: 'json',
+                success: function (arr) {
+                    lod.html(arr.msg);
+                }
+            });
+            event.preventDefault();
+            return false;
+        });
+		
+	/*	SEARCH BOX START*/
+	JQ('a.search-page').live('click', function (event) {
+		var str = JQ(this).attr('name');	
+		getInfo(str);
+		event.preventDefault();
+        return false;
+	});
+   JQ("#search").click(function (event) {
+		var str = JQ(".search_form").serialize(); 	
+		getInfo(str);
+		event.preventDefault();
+        return false;
+    }); 
+	
+	var getInfo = (function (stri) {     
+        JQ("#box").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />"); 
+        JQ.ajax({
+            type: "POST",
+            url: "http://www.todorivieramaya.com/app/search/",
+            data: stri,
+			cache: true,
+            success: function (data) {
+	        JQ("#box").html(data);
+			}
+		});	
+	});
+	JQ("#people").click(function (event) {
+		var str = JQ(this).parent().serialize(); 
+		var lod = JQ("#content #two").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/action/",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+					lod.html(arr);
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	/* EVENT CALENDAR*/
+	JQ('a.control').live('click', function (event) {  
+		var tt = JQ(this).attr('href');  
+        JQ("#events").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />"); 
+        JQ.ajax({
+            type: "POST",
+            url: tt,
+			cache: false,
+            success: function (data) {
+	        JQ("#events").html(data);
+			}
+		});
+        event.preventDefault();
+        return false;
+	});
+	
+	JQ('a.day_event').live('click', function (event) {  
+		var tt = JQ(this).attr('id');
+		JQ("#events .inf").css('display','block');
+        JQ("#events .inf").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />"); 
+        JQ.ajax({
+            type: "POST",
+            url: 'http://www.todorivieramaya.com/app/mods/events/event-single.php?id='+tt,
+			cache: true,
+            success: function (data) {
+	        JQ("#events .inf").html("<span class='close'></span>"+data);
+			}
+		});
+        event.preventDefault();
+        return false;
+	});
+	JQ('#events .inf span').live('click', function (event) {  
+		JQ("#events .inf").css('display','none');
+        JQ("#events .inf").html(""); 
+        event.preventDefault();
+        return false;
+	});
+	
+	JQ("div#calendar").on("click",".cal_control", function (event) {  
+		var tt = JQ(this).attr('href');  
+        JQ("#calendar").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />"); 
+        JQ.ajax({
+            type: "POST",
+            url: tt,
+			cache: false,
+            success: function (data) {
+	        JQ("#calendar").html(data);
+			}
+		});
+        event.preventDefault();
+        return false;
+	});
+	/*	GALLERY */
+		JQ('#slideshow-div').rsfSlideshow({
+		interval: 5,
+		transition: 800,
+		autostart: true,
+		effect: 'fade'
+	});
+	JQ('#slideshow-div').rsfSlideshow('bindPreviousSlide', JQ('#rs-prev'));
+	JQ('#slideshow-div').rsfSlideshow('bindNextSlide', JQ('#rs-next'));
+	JQ('#slideshow-div').rsfSlideshow('bindPlayPause', JQ('#rs-play'));
+	JQ('.gallery_listing span a').click(function(event) {
+		var clickedLi = JQ(this).parent().parent().parent();
+		JQ('.gallery_listing .hid').css('display', 'none');	
+		JQ('.op').animate({width: '29%'},0, function() {
+			JQ('.op').removeClass("op");
+			JQ('.gallery_listing .right').css('display', 'block');
+  		});
+		JQ(this).parent().parent().parent().parent().prepend(clickedLi);
+		clickedLi.find('.right').css('display', 'none');
+		clickedLi.animate({width: '598px'},500, function() {
+    		clickedLi.addClass("op");
+			clickedLi.find('.hid').css('display', 'block');
+			clickedLi.find('img').trigger('scrll');
+  		});
+		event.preventDefault();
+        return false;
+	});
+	JQ('.gallery_listing li a').click(function(event) {
+		var img_link = JQ(this).attr('href');
+		var img_title = JQ(this).attr('title');
+		var img_text = JQ(this).attr('data-text');
+		var img_usr = JQ(this).attr('data-user');
+		JQ('#images').html('<img src='+img_link+' />');
+		JQ('#img_data h2').html(img_usr);
+		JQ('#img_data h5').html(img_title);
+		JQ('#img_data p').html(img_text);
+		event.preventDefault();
+        return false;
+	});	
+	/* REVIEWS */
+	JQ("#reviews .inf #cbtn").live('click', function (event) { 
+        JQ(this).parent().append("<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />");
+		var str = JQ(this).parent().serialize();
+        JQ.ajax({
+            type: "POST",
+            url: 'http://www.todorivieramaya.com/app/mods/reviews/post-review.php',
+			data: str,
+            success: function (data) {
+	        JQ("#reviews .inf").html("<span class='close'></span><h6>review sent to moderation</h6><p>thank you for your review</p>");
+			}
+		})
+	});
+	
+	var bigModContents = JQ(".tab_content").css('visibility','hidden'),
+	bigMods = JQ("ul.tabs li");
+	bigMods.first().addClass("active").show();
+	bigModContents.first().css('visibility','visible');
+	bigMods.click(function(event) {
+		var $this = JQ(this),
+		activeTab = $this.find('a').attr('id');
+		loadUrl = $this.find('a').attr('href');
+		if(activeTab == '#map'){
+			$this.addClass('active').siblings().removeClass('active');
+			bigModContents.css('visibility','hidden').filter(activeTab).css('visibility','visible').fadeIn();
+			if(JQ("#map").html()){
+			
+			}else{
+				var ajax_load = "<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />";
+				JQ("#map").html(ajax_load).load(loadUrl, {}, function () {});
+			}
+		event.preventDefault();
+		return false;					
+		}
+		if(activeTab == '#events'){
+			$this.addClass('active').siblings().removeClass('active');
+			bigModContents.css('visibility','hidden').filter(activeTab).css('visibility','visible').fadeIn();
+			if(JQ("#events").html()){
+			
+			}else{
+				var ajax_load = "<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />";
+				JQ("#events").html(ajax_load).load(loadUrl, {}, function () {});
+			}
+		event.preventDefault();
+		return false;				
+		}
+		if(activeTab == '#calendar'){
+			$this.addClass('active').siblings().removeClass('active');
+			bigModContents.css('visibility','hidden').filter(activeTab).css('visibility','visible').fadeIn();
+			if(JQ("#calendar").html()){
+			
+			}else{
+				var ajax_load = "<img src='http://mexicobyimages.com/img/loading.gif' alt='loading...' />";
+				JQ("#calendar").html(ajax_load).load(loadUrl, {}, function () {});
+			}
+		event.preventDefault();
+		return false;				
+		}
+		if(!$this.hasClass('active')){
+			$this.addClass('active').siblings().removeClass('active');
+			bigModContents.css('visibility','hidden').filter(activeTab).css('visibility','visible').fadeIn();
+		} 
+		return false;
+	});
+	
+	/*menu*/
+	JQ('#cssdropdown li.headlink').hover(
+		function() { JQ('ul', this).css('display', 'block').slideDown();
+			JQ(this).find('a').css({'color':'#000000'});
+		 },
+		function() { JQ('ul', this).css('display', 'none');
+			JQ(this).find('a').css({'color':'#444444'});
+		 }
+	);
+	
+	JQ('#cssdropdown li.sublink').hover(
+		function() { JQ(this).parent().parent().css({'color':'#000000','background-color':'#F1F1E2','-moz-border-radius-topleft':'6px','border-top-left-radius':'6px','-moz-border-radius-topright':'6px','border-top-right-radius':'6px'});
+		 },
+		function() { JQ(this).parent().parent().css({'color':'#444444','background-color':'transparent'});
+		 }
+	);
+	JQ(".vote").click(function (event) {
+		var str = JQ(this).attr('name'); 
+		var lod = JQ(this).parent().find("span").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/action/",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+					lod.text(arr);
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ('.details').hide();
+	JQ('.it').hover(
+		function() {
+			JQ(this).find('.details').slideDown();
+		 },
+		function() {
+			JQ(this).find('.details').slideUp();
+		 }
+	);
+	if(JQ(".todoForm").length > 0){
+	JQ( ".checkin" ).attr( 'autocomplete', 'on');
+	JQ( ".checkout" ).attr( 'autocomplete', 'on');
+	var dates = JQ( ".checkin, .checkout" ).datepicker({												  
+		defaultDate: "+1w",
+		changeMonth: false,
+		numberOfMonths: 1,
+		dateFormat : 'd M, yy', 
+		minDate: 0,
+		defaultMinDate: 0,
+		maxDate: '+10M',
+		onSelect: function( selectedDate ) {
+			var date='';
+			var date2='';
+			var otherid='';	
+			if(this.id.indexOf('checkin')!=-1){
+				JQ( this ).datepicker( "option", 'minDate', JQ( this ).datepicker( "option", 'defaultMinDate') );
+				var otherid=this.id.replace(/checkin_/,'checkout_');
+				instance = JQ( this ).data( "datepicker" );
+				var date = JQ.datepicker.parseDate(
+					instance.settings.dateFormat ||
+					JQ.datepicker._defaults.dateFormat,
+					selectedDate, instance.settings );
+				var date2 = new Date(date.getFullYear(),date.getMonth(),date.getDate() + 1);
+				JQ( '#'+otherid ).datepicker( "option", 'minDate', date2 );
+			}
+		},
+		onClose: function( selectedDate ) {
+			var tmpdate=JQ('#'+this.id).datepicker ("getDate" );
+			if(!tmpdate) return;
+			var tmpd=tmpdate.getDate();
+			var tmpm=tmpdate.getMonth() +1;
+			var tmpy=tmpdate.getFullYear();
+			if(this.id.indexOf('checkin')!=-1){
+				var hiddenid=this.id.replace(/checkin_/,'checkinhidden_'); 
+				var otherid=this.id.replace(/checkin_/,'checkout_');		
+				JQ("#"+hiddenid).val( tmpy+'-'+tmpm+'-'+tmpd );
+				//JQ( "#"+otherid).focus();
+			}else{
+				var hiddenid=this.id.replace(/checkout_/,'checkouthidden_');		
+				JQ("#"+hiddenid).val( tmpy+'-'+tmpm+'-'+tmpd );
+				JQ("select[name='guests']").effect("highlight").focus();
+			}
+			JQ(this).change();
+		}
+	});	
+	JQ( ".checki" ).attr( 'autocomplete', 'on');
+	JQ( ".checkou" ).attr( 'autocomplete', 'on');
+	var dates = JQ( ".checki, .checkou" ).datepicker({												  
+		defaultDate: "+1w",
+		changeMonth: false,
+		numberOfMonths: 1,
+		dateFormat : 'd M, yy', 
+		minDate: 0,
+		defaultMinDate: 0,
+		maxDate: '+10M',
+		onSelect: function( selectedDate ) {
+			var date='';
+			var date2='';
+			var otherid='';	
+			if(this.id.indexOf('checki')!=-1){
+				JQ( this ).datepicker( "option", 'minDate', JQ( this ).datepicker( "option", 'defaultMinDate') );
+				var otherid=this.id.replace(/checki_/,'checkou_');
+				instance = JQ( this ).data( "datepicker" );
+				var date = JQ.datepicker.parseDate(
+					instance.settings.dateFormat ||
+					JQ.datepicker._defaults.dateFormat,
+					selectedDate, instance.settings );
+				var date2 = new Date(date.getFullYear(),date.getMonth(),date.getDate() + 1);
+				JQ( '#'+otherid ).datepicker( "option", 'minDate', date2 );
+			}
+		},
+		onClose: function( selectedDate ) {
+			var tmpdate=JQ('#'+this.id).datepicker ("getDate" );
+			if(!tmpdate) return;
+			var tmpd=tmpdate.getDate();
+			var tmpm=tmpdate.getMonth() +1;
+			var tmpy=tmpdate.getFullYear();
+			if(this.id.indexOf('checki')!=-1){
+				var hiddenid=this.id.replace(/checki_/,'checkihidden_'); 
+				var otherid=this.id.replace(/checki_/,'checkou_');		
+				JQ("#"+hiddenid).val( tmpy+'-'+tmpm+'-'+tmpd );
+				//JQ( "#"+otherid).focus();
+			}else{
+				var hiddenid=this.id.replace(/checkou_/,'checkouhidden_');		
+				JQ("#"+hiddenid).val( tmpy+'-'+tmpm+'-'+tmpd );
+				JQ("select[name='guests']").effect("highlight").focus();
+			}
+			JQ(this).change();
+		}
+	});	
+	//JQ(function(){
+		todoRS=new RoomSelected;
+		todoRS.name='todoRS';
+		todoRS.data={'rooms_num':[1],'adt':[],'chd':[]};
+	todoRS.data['chdAges|1']=[]; todoRS.data['chdAges|2']=[]; todoRS.data['chdAges|3']=[];
+	var dat = "[{\"adt\":\"2\",\"chd\":\"0\"}]";
+	JQ.each(dat, function(i, itema) {
+		var ad = itema.adt;
+		var ch = itema.chd;
+		todoRS.data.adt[i]=ad; todoRS.data.chd[i]=ch;
+		if(ch > 0){
+			var chn = itema.chdAges;
+			JQ.each(chn, function(j, itemb) {
+				todoRS.data['chdAges|'+j][i]=itemb;
+			});
+		}			
+	});
+		todoRS.init();
+	//});
+	JQ(".checkit").click(function (event) { 
+		var str = JQ("#bookit").serialize(); 
+		var lod = JQ("#bookit #checked").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/bookings/lib/actions.php",
+			data: str,
+			cache: false,
+			dataType: 'json',
+			success: function (arr) {
+				if(arr.msg == 'success'){						
+					lod.html(arr.res);
+				}else{					
+					lod.html(arr.res);
+				}
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ.ajaxSetup({ cache:false });
+	JQ(".todo-submit-btn").click(function (event) {	
+		var rand = Math.random() * 10;
+		var str = JQ("#todoForm").serialize(); 
+		var lod = JQ(this);
+		lod.addClass('lod'); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/expedia/lib/actions.php?r=" + rand,
+			data: str,
+			cache: false,
+			success: function (arr) {
+				lod.removeClass('lod'); 
+				JQ("#content_details").html(arr);
+				JQ("#content_details").prepend("<h3>Available rooms</h3>");
+				JQ('html, body').animate({scrollTop: JQ("#content_details").offset().top}, 2000);
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ(".todo-all-btn").click(function (event) {	
+		var rand = Math.random() * 10;
+		var str = JQ("#todoForm").serialize(); 
+		var lod = JQ(this);
+		lod.addClass('lod'); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/expedia/lib/actions.php?r=" + rand,
+			data: str,
+			cache: false,
+			success: function (arr) {
+				lod.removeClass('lod'); 
+				JQ("#content_details").html(arr);
+				//JQ("#content_details").prepend("<h3>Available Hotels</h3>");
+				JQ('html, body').animate({scrollTop: JQ("#content_details").offset().top}, 2000);
+				reloadFilters ();
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+	JQ(".info-submit-btn").click(function (event) { 
+		var rand = Math.random() * 10;
+		var str = JQ(this).parent().serialize(); 
+		var lod = JQ(this).parent().find("#checked").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />"); 
+		JQ.ajax({
+			type: "POST",
+			url: "http://www.todorivieramaya.com/app/mods/expedia/lib/actions.php?r=" + rand,
+			data: str,
+			cache: false,
+			success: function (arr) {
+				lod.html('');
+				JQ("#content_details").html(arr);
+			}
+		});
+		event.preventDefault();
+		return false;
+	});
+
+		JQ('#hw-check-avl').hover(function(){
+			mouse_is_inside=true;
+		}, function(){
+			mouse_is_inside=false;
+		});
+
+		JQ('#ui-datepicker-div').hover(function(){
+			mouse_is_inside=true;
+		}, function(){
+			mouse_is_inside=false;
+		});
+		if(JQ("#hw-check-avl").length > 0){
+			JQ('.btn-book').hover(function(){
+				mouse_is_inside=true;
+			}, function(){
+				mouse_is_inside=false;
+			});
+	
+			JQ('body').mouseup(function(){
+				if(!mouse_is_inside) {
+					var top=JQ('#hw-check-avl').offset().top;
+					JQ('#hw-check-avl').animate({
+						opacity: 0,
+						top: top+50,
+					},250,function() {
+						JQ('#hw-check-avl').css('display','none');
+					});
+				}
+			});
+		}
+	}
+
+	function reloadFilters () {
+		JQ(".filters li").each(function(){
+			var val = JQ(this).find('input').val();
+			var $valcount = JQ("#content_list ."+val).length;
+			JQ(this).find('span').html($valcount);
+			//alert($valcount);
+		});
+		var $itval = JQ("#content_list li").length;
+		JQ(".filters li input[value*='comp']").parent().find('span').html($itval);
+	}
+	reloadFilters ();
+    // When clicking an item in the filter list, elements will appear or dissappear
+    // depending on whether list item is checked or unchecked.
+   JQ(".filters li ").on("click","input[type=checkbox]", function (event) {  
+		var n = JQ(".filters li input:checked").length;
+		var selection = JQ(this).val();
+		if(n == 0 || n == 1){
+        	JQ("#content_list li").hide();
+			if(JQ("#map_canvas").length > 0){
+				//hideAll();
+			}
+		}
+		if(JQ("#map_canvas").length > 0){
+			//boxclick(this, selection);
+		}
+        if (selection == "comp"){
+            //show all items		
+            if (JQ(this).is(':checked')){
+                JQ("#content_list li").show();
+                JQ(".filters li input[type=checkbox]").attr('checked','checked');
+                JQ(".filters li").addClass('checked');
+                JQ(".filters li label").css({'color':'#ff9900'});
+				JQ(".filters li span").css({'color':'#ff9900'});
+				if(JQ("#map_canvas").length > 0){
+				//showAll();
+				}
+				var vivibleItem1=JQ('#content_list > li:visible').length;
+    			JQ('#visible_items').html(vivibleItem1);
+				lazyReload();
+            }else{
+                JQ("#content_list li").hide( function() {
+                   // JQ(".played").show();
+                });
+                JQ(".filters li input[type=checkbox]").removeAttr('checked');
+                JQ(".filters li").removeClass('checked');
+                JQ(".filters li label").css({'color':'#999999'});
+				JQ(".filters li span").css({'color':'#999999'});
+				if(JQ("#map_canvas").length > 0){
+				//hideAll();
+				}
+				var vivibleItem2=0;
+    			JQ('#visible_items').html(vivibleItem2);
+				lazyReload();
+            }
+        }else{
+            if (JQ(this).is(':checked')){
+				
+                JQ("#content_list li."+selection).prependTo('#content_list').show();
+               
+                var stringOfClassNames = '';
+                var thisClassString = JQ("#content_list li."+selection).attr('class');
+                stringOfClassNames = thisClassString;
+               
+                var arrayClasses = stringOfClassNames.split(' ');
+                JQ.each(arrayClasses, function() {
+                    JQ('.filters input[value='+this+']').parent('li').addClass('checked');
+                    JQ('.filters input[value='+this+']').parent('li').find('label').css({'color':'#999999'});
+					JQ('.filters input[value='+this+']').parent('li').find('span').css({'color':'#999999'});
+                    JQ('.filters input[value='+this+']').attr('checked','checked');
+                });
+               
+                JQ(this).parent('li').addClass('checked');
+				JQ(this).find(':after').css({'color':'#ff9900'});
+                JQ(this).parent().find('label').css({'color':'#ff9900'});
+                JQ(this).parent().find('span').css({'color':'#ff9900'});
+				var vivibleItem3=JQ('#content_list > li:visible').length;
+    			JQ('#visible_items').html(vivibleItem3);
+				lazyReload();
+            }else{
+                JQ("#content_list li."+selection).hide( function() {
+               
+                    var stringOfClassNames = '';
+                    var thisClassString = JQ("#content_list li."+selection).attr('class');
+                    stringOfClassNames = thisClassString;
+                   
+                    var arrayClasses = stringOfClassNames.split(' ');
+                    JQ.each(arrayClasses, function() {
+                        JQ('.filters input[value='+this+']').parent('li').removeClass('checked');
+                        JQ('.filters input[value='+this+']').parent('li').find('label').css({'color':'#999999'});
+						JQ('.filters input[value='+this+']').parent('li').find('span').css({'color':'#999999'});
+                        JQ('.filters input[value='+this+']').removeAttr('checked');
+                    });
+                   
+                    if (JQ('.filters input:checked').length <= 0){
+                        JQ("#content_list li").hide();
+						var vivibleItem4=0;
+    		   			JQ('#visible_items').html(vivibleItem4);
+                       // JQ(".played").show();
+					   alert("whaaaaaaaaaaaaaat");
+                    }
+				  
+                });
+                JQ(this).parent('li').removeClass('checked');
+                JQ(this).parent('li.'+selection+' input[type=checkbox]').removeAttr('checked');
+                JQ(this).parent().find('label').css({'color':'#999'});
+                JQ(this).parent().find('span').css({'color':'#999'});
+				var vivibleItem5=JQ('#content_list > li:visible').length;
+				JQ('#visible_items').html(vivibleItem5);
+				lazyReload();
+				
+                if (JQ('#filterAll').is(':checked')){
+                    JQ('#filterAll').removeAttr('checked');
+                    JQ('#filterAll').parent().find('li').removeClass('checked');
+                    JQ('#filterAll').parent().find('label').css({'color':'#999'});
+               }
+            }
+        }
+		
+		
+    });
+	///////SMART EXPRESS BOOKING
+	JQ.fn.crearcookie = function () {
+        var a = [];
+        JQ("#cartlist li").each(function (c) {
+            var b = JQ(this).find(".databtn .hidData").val();
+            a[c] = b
+        });
+        createCookie("fechas", a, 7)
+		b = JQ(".cli").val();
+	 };
+    JQ.fn.checkcookie = function () {
+        readCookie("fechas") == null && (JQ("#btn").hide(), JQ("#footer p").append("<br/>You need to enable cookies to book more than one room!"))
+    };
+
+	
+	
+	JQ("#seb_btn").click(function (a) {
+		//alert('heeeeeeeeeeeeeeeeeeyyyyyyyyyyyyyy');
+        //JQ("#header").hide();
+        //JQ("#content_details").slideDown();
+        JQ("#content_details").html("<img src='http://mexicobyimages.com/img/loading.gif' alt='Connecting...' />");
+        var c = JQ(this).parent().serialize(),
+            b = JQ(".cli").val();
+        	JQ.ajax({
+            type: "POST",
+            url: "http://www.todorivieramaya.com/app/mods/seb/lib/process.php",
+            data: c,
+            cl: b,
+            success: function (a) {
+                JQ("#content_details").children().remove();
+                JQ("#content_details").html(a);
+                /*JQ("#content_details").append('<div class="page_navigation"></div>');
+                JQ("#content_details .datelist").prev().append('<a href="#" class="toggleLink">Order Details</a>');
+                JQ("#content_details .datelist").prev().append('<a href="#" class="showDetail">Room Details</a>');
+                JQ("#off").append(JQ("#content_details").find(".res"));
+                JQ("#seas").html(JQ("#content_details").find(".seasons"));
+                JQ(".datelist").hide();*/
+                JQ(".extras").hide();
+                JQ("#cart").hide();
+                JQ(".toggleCart").removeClass("cartopen").addClass("cartclose");
+                var c = {};
+                JQ("#content_details li").each(function () {
+                    var a = JQ(this).attr("name");
+                    c[a] ? JQ(this).hide() : c[a] = !0
+                });
+                var b = JQ("#content_details ul"),
+                    a = b.children("li").get();
+                a.sort(function (a, c) {
+                    var b = JQ(a).attr("name"),
+                        k = JQ(c).attr("name");
+                    return b < k ? -1 : b > k ? 1 : 0
+                });
+                JQ.each(a, function (a, c) {
+                    b.append(c)
+                });
+            }
+        });
+        a.preventDefault();
+        return !1
+    });
+	JQ(".addBtn").live("click", function (a) {
+        JQ("#cartbtn").css({display:"block"});
+        JQ(".extras").hide();
+		JQ("#cart").show();
+        if (JQ("#cartlist li").length <= 2) {
+            JQ("#cartlist li").length < 1 ? JQ("#cartdata").html("1 room in your cart") : JQ("#cartlist li").length < 2 ? JQ("#cartdata").html("2 rooms in your cart") : JQ("#cartlist li").length < 3 && (JQ("#cartdata").html("3 rooms in your cart"), JQ("#cobnt").hide());
+            var c = JQ(this).parent().parent().parent().parent().attr("class"),
+                b = JQ(this).parent().parent().parent().parent().attr("id"),
+                d = JQ(this).parent().parent().parent().parent().attr("name"),
+                h = JQ(this).parent().parent().parent().parent().html();
+            JQ('<li class="' + c + '" id="' + b + '" name="' + d + '">' + h + "</li>").appendTo("#cartlist");
+            JQ("#eti .extras ").find("select").length > 0 && (JQ('<a href="#" class="toggleExtras">Extras</a>').appendTo("#cartlist #" + b + " .datalist"), JQ("#eti").find(".extras").clone().appendTo("#cartlist #" + b + ""));
+            JQ("#cartlist #" + b).find(".addBtn").val("Remove");
+            JQ("#cartlist #" + b).find(".addBtn").addClass("rem").removeClass("addBtn");
+            JQ(this).parent().parent().parent().parent().remove();
+            var l = {};
+            JQ("#content_details li").each(function () {
+                JQ(this).show();
+                var a = JQ(this).attr("name");
+                l[a] ? JQ(this).hide() : l[a] = !0
+            });
+            var f = JQ("#content_details ul"),
+                c = f.children("li").get();
+            c.sort(function (a, c) {
+                var b = JQ(a).attr("name"),
+                    i = JQ(c).attr("name");
+                return b < i ? -1 : b > i ? 1 : 0
+            });
+            JQ.each(c, function (a, c) {
+                f.append(c)
+            })
+        } else alert("You can book a maximum of 3 rooms");
+        /*JQ("#content_details").pajinate({
+            items_per_page: pagestoshow,
+            num_page_links_to_display: 8
+        });*/
+        JQ(".paypal").show();
+        
+       // JQ("#content_details").hide();
+        JQ(this).crearcookie();
+        JQ(this).checkcookie();
+        a.preventDefault();
+        return !1
+    });
+
+	 JQ(".rem").live("click", function (a) {
+        var c = JQ(this).parent().parent().parent().parent().attr("class"),
+            b = JQ(this).parent().parent().parent().parent().attr("id"),
+            d = JQ(this).parent().parent().parent().parent().attr("name"),
+            h = JQ(this).parent().parent().parent().parent().html();
+   
+            JQ("#content_details").prepend('<li class="rooms rooms_results" id="' + b + '" name="' + d + '">' + h + "</li>");
+            JQ("#content_details #" + b).find(".rem").val("Select");
+            JQ("#content_details #" + b).find(".rem").removeClass("rem").addClass("addBtn");
+            JQ("#content_details #" + b).find(".toggleExtras").remove();
+            JQ("#content_details #" + b).find(".extras").remove();
+            JQ(this).parent().parent().parent().parent().remove();
+            var l = {};
+            JQ("#content_details li").each(function () {
+                JQ(this).show();
+                var a = JQ(this).attr("name");
+                l[a] ? JQ(this).hide() : l[a] = !0
+            });
+            var f = JQ("#content_details ul"),
+                c = f.children("li").get();
+            c.sort(function (a, c) {
+                var b = JQ(a).attr("name"),
+                    i = JQ(c).attr("name");
+                return b < i ? -1 : b > i ? 1 : 0
+            });
+            JQ.each(c, function (a, c) {
+                f.append(c)
+            })
+        
+        JQ("#cartlist li").length < 1 ? (JQ("#cartdata").html("Your cart is empty"), JQ(".paypal").hide()) : JQ("#cartlist li").length < 2 ? JQ("#cartdata").html("1 room in your cart") : JQ("#cartlist li").length < 3 && (JQ("#cartdata").html("2 rooms in your cart"), JQ("#cobnt").show());
+
+       /* JQ("#content_details").pajinate({
+            items_per_page: pagestoshow,
+            num_page_links_to_display: 8
+        });*/
+        JQ(this).crearcookie();
+        JQ("#btn").show();
+		JQ("#cart").slideUp();
+		
+        a.preventDefault();
+        return !1
+    });
+	////////////END SMART EXPRESS BOOKING
+	JQ("#promo_hotels").als({
+		visible_items: 2,
+		scrolling_items: 2,
+		orientation: "vertical",
+		circular: "yes",
+		autoscroll: "yes",
+		interval: 6000,
+		direction: "up"
+	});
+	JQ("#near_hotels").als({
+		visible_items: 2,
+		scrolling_items: 2,
+		orientation: "horizontal",
+		circular: "yes",
+		autoscroll: "yes",
+		interval: 6000,
+		direction: "left"
+	});
+	if(JQ('#featured_items div ul li').size() >=2){
+		JQ("#featured_items").als({
+			visible_items: 1,
+			scrolling_items: 1,
+			orientation: "horizontal",
+			circular: "yes",
+			autoscroll: "yes",
+			interval: 6000,
+			direction: "left"
+		});
+	}
+	var biggest = 0;
+	var smallest = 5000000;
+	function rangeFinder(){
+		JQ('#content_list li').each(function() {	
+			if(biggest < parseInt(JQ(this).attr("data-price"), 10)){
+				biggest = parseInt(JQ(this).attr("data-price"), 10);	
+			}
+			if(smallest > parseInt(JQ(this).attr("data-price"), 10) && parseInt(JQ(this).attr("data-price"), 10) > 0){
+				smallest = parseInt(JQ(this).attr("data-price"), 10);	
+			}
+		});
+	}
+	rangeFinder();
+	JQ(".leftrange").html(smallest);
+	JQ(".rightrange").html(biggest);
+	function rangeFilter(minPrice, maxPrice) {
+		JQ("#content_list li").hide().filter(function() {
+			var price = parseInt(JQ(this).attr("data-price"), 10);
+			return price >= minPrice && price <= maxPrice;
+		}).show();
+	}
+	var options = {
+			range: true,
+			min: 0,
+			max: biggest,
+			values: [0, biggest],
+			slide: function(event, ui) {
+				var min = ui.values[0],max = ui.values[1];
+				JQ("#amount").html("$" + min + " - $" + max);
+				rangeFilter(min, max);
+				var vivible_Items=JQ('#content_list > li:visible').length;
+    	        JQ('#visible_items').html(vivible_Items);
+			}
+		}, min, max;
+	JQ("#slider-range").slider(options);
+	min = JQ("#slider-range").slider("values", 0);
+	max = JQ("#slider-range").slider("values", 1);
+	JQ("#amount").html("$" + min + " - $" + max);
+	//rangeFilter(80, biggest);
+	var allItems=JQ('#content_list > li').length;
+	var vivibleItems=JQ('#content_list > li:visible').length;
+	JQ('#visible_items').html(vivibleItems); 
+	JQ('#all_items').html(allItems);
+	
+	function sortFilter(parent, childSelector, keySelector) {
+		var items = parent.children(childSelector).sort(function(a, b) {
+			if(keySelector=='span.rate'){
+				var vA = parseInt(JQ(keySelector, a).text(), 10);
+				var vB = parseInt(JQ(keySelector, b).text(), 10);
+				return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+			}else{
+				var vA = JQ(keySelector, a).text();
+				var vB = JQ(keySelector, b).text();
+				return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+				
+			}
+		});
+		JQ('#content_list img').trigger('scrll');
+		parent.append(items);
+	}
+	JQ('#sPrice').data("sortKey", "span.rate");
+	JQ('#sStyle').data("sortKey", "a.title");
+	
+	JQ(".btnSort").click(function(event) {
+	   sortFilter(JQ('#content_list'), "li", JQ(this).data("sortKey"));
+	   	event.preventDefault();
+		return false;
+	});
+	JQ(".showdeals").click(function(event) {
+		var d = JQ("#todoAllForm").attr("action");
+		JQ("#todoAllForm").attr("action", d+"-deals/");
+	    JQ(".home-all-btn").click();
+	   	event.preventDefault();
+		return false;
+	});
+ 
+});	 
+</script>
+</body>
+</html>

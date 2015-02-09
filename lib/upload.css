@@ -1,0 +1,5 @@
+.uploadifyError{background-color:#fde5dd !important;border:2px solid #fbcbbc !important}
+.uploadifyProgress{background-color:#ffffff;border-bottom:1px solid #c5c5c5;border-left:1px solid #808080;border-right:1px solid #c5c5c5;border-top:1px solid #808080;margin-top:10px;width:100%}
+.uploadifyProgressBar{background-color:#0099ff;height:3px;width:1px}
+.uploadifyQueueItem{background-color:#f5f5f5;border:2px solid #e5e5e5;font:11px Verdana,Geneva,sans-serif;margin-top:5px;padding:10px;width:350px}
+.uploadifyQueueItem .cancel{float:right}
